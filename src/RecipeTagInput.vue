@@ -5,28 +5,52 @@
             :class="[statusType, size, containerClasses]"
             :disabled="disabled"
             @click="hasInput && focus($event)">
-            <b-tag
-                v-for="(tag, index) in tags"
-                :key="index"
-                :type="type"
-                :size="size"
-                :rounded="rounded"
-                :attached="attached"
-                :tabstop="false"
-                :disabled="disabled"
-                :ellipsis="ellipsis"
-                :closable="closable"
-                :title="ellipsis && getNormalizedTagText(tag)"
-                @close="removeTag(index)">
-                {{ getNormalizedTagText(tag) }}
-            </b-tag>
+            <b-taglist attached v-for="(tag, index) in tags" :key="index">
+                <b-tag
+                    v-if="!tag.deleted"
+                    :type="type"
+                    :size="size"
+                    :attached="attached"
+                    :tabstop="false"
+                    :disabled="disabled"
+                    :ellipsis="ellipsis"
+                    :title="ellipsis && getNormalizedTagText(tag.name)"
+                    @close="removeTag(index)">
+                    {{ getNormalizedTagText(tag.name) }}
+                </b-tag>
+                 <b-tag v-if="tag.label.name && tag.done && !tag.deleted"
+                    type="is-info"
+                    :size="size"
+                    :rounded="rounded"
+                    :tabstop="false"
+                    :disabled="disabled"
+                    :ellipsis="ellipsis"
+                    :closable="closable"
+                    :title="ellipsis && getNormalizedTagText(tag.label.name)"
+                    @close="removeTag(index)">
+                    {{ getNormalizedTagText(tag.label.name) }}
+                </b-tag>
+                <b-dropdown position="is-top-right" trap-focus :close-on-click="false" v-else-if="!tag.deleted">
+                <b-tag class="add" type="is-success" slot="trigger" role="button">
+                    <b-icon icon="plus" size="is-small" @click="editLabel(tag)"></b-icon></b-tag>
+                    <b-dropdown-item :custom="true" aria-role="listitem">
+                        <p>Label</p>
+                        <b-field>
+                        <b-input size="is-small" v-model="tag.label.name"></b-input>
+                            <p class="control">
+                        <b-button size="is-small" type="is-primary" @click="editLabel(tag)">Done</b-button>
+                            </p>
+                        </b-field>
+                    </b-dropdown-item>
+                </b-dropdown>
+            </b-taglist>
 
             <b-autocomplete
                 ref="autocomplete"
                 v-if="hasInput"
                 v-model="newTag"
                 v-bind="$attrs"
-                :data="data"
+                :data="internalData"
                 :field="field"
                 :icon="icon"
                 :icon-pack="iconPack"
@@ -49,9 +73,17 @@
                 <template
                     :slot="defaultSlotName"
                     slot-scope="props">
+                    <b-field grouped>
                     <slot
                         :option="props.option"
-                        :index="props.index" />
+                        :index="props.id" />
+                        <div class="control">
+                     <b-taglist attached>
+                        <b-tag type="is-dark">{{ props.option.name }}</b-tag>
+                        <b-tag v-if="props.option.label" type="is-info">{{ props.option.label.name }}</b-tag>
+                </b-taglist>
+                        </div>
+                    </b-field>
                 </template>
                 <template :slot="emptySlotName">
                     <slot name="empty" />
@@ -73,7 +105,17 @@
     </div>
 </template>
 
+<style scoped>
+.add {
+    cursor: pointer;
+}
+.add:focus, .add:hover {
+    background-color: rgba(10,10,10,.3);
+}
+</style>
+
 <script>
+import debounce from 'lodash/debounce'
 import { getValueByPath } from 'Buefy/src/utils/helpers'
 import Tag from 'Buefy/src/components/tag/Tag'
 import Autocomplete from 'Buefy/src/components/autocomplete/Autocomplete'
@@ -96,7 +138,10 @@ export default {
             type: Array,
             default: () => []
         },
-        type: String,
+        type: { 
+            type: String,
+            default: 'is-light' 
+        },
         rounded: {
             type: Boolean,
             default: false
@@ -145,12 +190,19 @@ export default {
         allowDuplicates: {
             type: Boolean,
             default: false
+        },
+        careDeleted: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
         return {
             tags: Array.isArray(this.value) ? this.value.slice(0) : (this.value || []),
+            typing: false,
             newTag: '',
+            isFetching: false,
+            internalData: this.data,
             _elementRef: 'input',
             _isTaginput: true
         }
@@ -226,6 +278,28 @@ export default {
         }
     },
     methods: {
+        getAsyncData: debounce(function (name) {
+            if (!name.length) {
+                    this.internalData = []
+                    return
+                }
+                this.isFetching = true
+                this.$http.get(`/recipes/tags?name=${name}`)
+                    .then(({ data }) => {
+                        this.internalData = []
+                        data.current.forEach((item) => this.internalData.push(item))
+                    })
+                    .catch((error) => {
+                        this.internalData = []
+                        throw error
+                    })
+                    .finally(() => {
+                        this.isFetching = false
+                    })
+            }, 500),
+        editLabel(tag) {
+            this.$set(tag, "done", true);
+        },
         addTag(tag) {
             const tagToAdd = tag || this.newTag.trim()
             if (tagToAdd) {
@@ -241,9 +315,13 @@ export default {
                 }
                 // Add the tag input if it is not blank
                 // or previously added (if not allowDuplicates).
-                const add = !this.allowDuplicates ? this.tags.indexOf(tagToAdd) === -1 : true
+                const add = !this.allowDuplicates ? this.tags.map(tag => tag.name).indexOf(tagToAdd.name) === -1 : true
                 if (add && this.beforeAdding(tagToAdd)) {
-                    this.tags.push(tagToAdd)
+                    if (typeof tagToAdd === 'string') this.tags.push({ name: tagToAdd, label: { name: '' } })
+                    else {
+                        if (!tagToAdd.label) tagToAdd.label = { name: '' };
+                        this.tags.push(tagToAdd);
+                    }
                     this.$emit('input', this.tags)
                     this.$emit('add', tagToAdd)
                 }
@@ -269,10 +347,13 @@ export default {
             })
         },
         removeTag(index) {
-            const tag = this.tags.splice(index, 1)[0]
-            this.$emit('input', this.tags)
-            this.$emit('remove', tag)
+            let tag = this.tags[index];
+            if (this.tags[index].id && this.careDeleted) tag.deleted = true;
+            else { tag = this.tags.splice(index, 1)[0]; }
+            this.$emit('input', this.tags);
+            this.$emit('remove', tag);
             return tag
+            
         },
         removeLastTag() {
             if (this.tagsLength > 0) {
@@ -291,7 +372,8 @@ export default {
             }
         },
         onTyping($event) {
-            this.$emit('typing', $event.trim())
+            this.$emit('typing', $event.trim());
+            this.getAsyncData($event);
         }
     }
 }
