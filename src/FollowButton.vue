@@ -1,13 +1,11 @@
 <template>
   <b-button type="is-outlined-primary" size="is-small" v-if="!following" @click="follow">Follow</b-button>
-  <span v-else><small class="has-text-primary">Following</small> <b-dropdown style="width:30px;" position="is-bottom-left" hoverable aria-role="list">
-            <b-icon
-                icon="chevron-down"
-                slot="trigger" size="is-small">
-            </b-icon>
-          <b-dropdown-item aria-role="listitem" @click="unfollow">Unfollow</b-dropdown-item>
-        </b-dropdown>
-  </b-dropdown>
+  <span v-else>
+    <small class="has-text-primary">Following</small>
+    <b-dropdown style="width:30px;" position="is-bottom-left" hoverable aria-role="list">
+      <b-icon icon="chevron-down" slot="trigger" size="is-small"></b-icon>
+      <b-dropdown-item aria-role="listitem" @click="unfollow">Unfollow</b-dropdown-item>
+    </b-dropdown>
   </span>
 </template>
 
