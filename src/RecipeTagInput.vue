@@ -19,7 +19,7 @@
                     {{ getNormalizedTagText(tag.name) }}
                 </b-tag>
                  <b-tag v-if="tag.label.name && tag.done && !tag.deleted"
-                    type="is-info"
+                    :type="labelStyle[tag.label.level - 1]"
                     :size="size"
                     :rounded="rounded"
                     :tabstop="false"
@@ -31,15 +31,40 @@
                     {{ getNormalizedTagText(tag.label.name) }}
                 </b-tag>
                 <b-dropdown position="is-top-right" trap-focus :close-on-click="false" v-else-if="!tag.deleted">
-                <b-tag class="add" type="is-success" slot="trigger" role="button">
-                    <b-icon icon="plus" size="is-small" @click="editLabel(tag)"></b-icon></b-tag>
+                    <b-tag class="add" type="is-success" slot="trigger" role="button">
+                        <b-icon icon="plus" size="is-small" @click="editLabel(tag)"></b-icon>
+                    </b-tag>
                     <b-dropdown-item :custom="true" aria-role="listitem">
                         <p>Label</p>
                         <b-field>
-                        <b-input size="is-small" v-model="tag.label.name"></b-input>
-                            <p class="control">
-                        <b-button size="is-small" type="is-primary" @click="editLabel(tag)">Done</b-button>
-                            </p>
+                            <b-input size="is-small" v-model="tag.label.name"></b-input>
+                                <p class="control">
+                                    <b-button size="is-small" type="is-primary" @click="editLabel(tag)">Done</b-button>
+                                </p>
+                        </b-field>
+                        <!-- <div class="buttons">
+                            <b-button type="is-info" size="is-small"></b-button>
+                            <b-button type="is-success" size="is-small"></b-button>
+                            <b-button type="is-warning" size="is-small"></b-button>
+                            <b-button type="is-danger" size="is-small"></b-button>
+                        </div> -->
+                        <b-field>
+                            <b-radio-button v-model="tag.label.level"
+                                native-value="1"
+                                type="is-info">
+                            </b-radio-button>
+                            <b-radio-button v-model="tag.label.level"
+                                native-value="2"
+                                type="is-success">
+                            </b-radio-button>
+                            <b-radio-button v-model="tag.label.level"
+                                native-value="3"
+                                type="is-warning">
+                            </b-radio-button>
+                            <b-radio-button v-model="tag.label.level"
+                                native-value="4"
+                                type="is-danger">
+                            </b-radio-button>
                         </b-field>
                     </b-dropdown-item>
                 </b-dropdown>
@@ -194,6 +219,10 @@ export default {
         careDeleted: {
             type: Boolean,
             default: false
+        },
+        labelStyle: {
+            type: Array,
+            default: () => ['is-info', 'is-success', 'is-warning', 'is-danger']
         }
     },
     data() {
@@ -204,7 +233,7 @@ export default {
             isFetching: false,
             internalData: this.data,
             _elementRef: 'input',
-            _isTaginput: true
+            _isTaginput: true,
         }
     },
     computed: {
@@ -317,7 +346,7 @@ export default {
                 // or previously added (if not allowDuplicates).
                 const add = !this.allowDuplicates ? this.tags.map(tag => tag.name).indexOf(tagToAdd.name) === -1 : true
                 if (add && this.beforeAdding(tagToAdd)) {
-                    if (typeof tagToAdd === 'string') this.tags.push({ name: tagToAdd, label: { name: '' } })
+                    if (typeof tagToAdd === 'string') this.tags.push({ name: tagToAdd, label: { name: '', level: 1 } })
                     else {
                         if (!tagToAdd.label) tagToAdd.label = { name: '' };
                         this.tags.push(tagToAdd);
