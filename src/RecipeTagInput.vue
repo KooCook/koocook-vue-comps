@@ -105,7 +105,7 @@
                         <div class="control">
                      <b-taglist attached>
                         <b-tag type="is-dark">{{ props.option.name }}</b-tag>
-                        <b-tag v-if="props.option.label" type="is-info">{{ props.option.label.name }}</b-tag>
+                        <b-tag v-if="props.option.label" :type="labelStyle[props.option.label.level - 1]">{{ props.option.label.name }}</b-tag>
                 </b-taglist>
                         </div>
                     </b-field>
