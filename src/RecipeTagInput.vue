@@ -42,47 +42,23 @@
                                     <b-button size="is-small" type="is-primary" @click="editLabel(tag)">Done</b-button>
                                 </p>
                         </b-field>
+                        <p>Color</p>
                         <b-field>
-                            <!-- <b-radio-button v-model="tag.label.level"
-                                native-value="1"
-                                type="is-info"
-                                focus>
-                                <b-icon icon="check-circle" ></b-icon> 
-                            </b-radio-button>
-                            <b-radio-button v-model="tag.label.level"
-                                native-value="2"
-                                type="is-success">
-                                <b-icon icon="check-circle" ></b-icon> 
-                            </b-radio-button>
-                            <b-radio-button v-model="tag.label.level"
-                                native-value="3"
-                                type="is-warning">
-                                <b-icon icon="check-circle" ></b-icon> 
-                            </b-radio-button>
-                            <b-radio-button v-model="tag.label.level"
-                                native-value="4"
-                                type="is-danger">
-                                <b-icon icon="check-circle"></b-icon> 
-                            </b-radio-button> -->
                             <RecipeRadioButton v-model="tag.label.level"
                                 native-value="1"
                                 type="is-info">
-                                <b-icon icon="check-circle" type="is-white"></b-icon>
                             </RecipeRadioButton>
                             <RecipeRadioButton v-model="tag.label.level"
                                 native-value="2"
                                 type="is-success">
-                                <b-icon icon="check-circle" type="is-white"></b-icon>
                             </RecipeRadioButton>
                             <RecipeRadioButton v-model="tag.label.level"
                                 native-value="3"
                                 type="is-warning">
-                                <b-icon icon="check-circle" type="is-white"></b-icon>
                             </RecipeRadioButton>
                             <RecipeRadioButton v-model="tag.label.level"
                                 native-value="4"
                                 type="is-danger">
-                                <b-icon icon="check-circle" type="is-white"></b-icon>
                             </RecipeRadioButton>
                         </b-field>
                     </b-dropdown-item>

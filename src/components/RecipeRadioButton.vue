@@ -10,7 +10,9 @@
             :disabled="disabled"
             @click="focus"
             @keydown.prevent.enter="$refs.label.click()">
-            <slot v-if="newValue === nativeValue"></slot>
+            <slot></slot>
+            <b-icon icon="check-circle" type="is-white" v-if="newValue === nativeValue"></b-icon>
+            <b-icon icon="check-circle" :type="type" v-else></b-icon>
             <input
                 v-model="computedValue"
                 type="radio"
