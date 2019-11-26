@@ -1,7 +1,7 @@
 <template>
     <div class="control" :class="{ 'is-expanded': expanded }">
         <label
-            class="b-radio radio button has-text-center"
+            class="b-radio radio button has-text-centered"
             ref="label"
             :class="[type, size, {
                 'is-disabled': disabled,
