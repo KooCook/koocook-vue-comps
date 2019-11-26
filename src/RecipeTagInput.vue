@@ -42,29 +42,48 @@
                                     <b-button size="is-small" type="is-primary" @click="editLabel(tag)">Done</b-button>
                                 </p>
                         </b-field>
-                        <!-- <div class="buttons">
-                            <b-button type="is-info" size="is-small"></b-button>
-                            <b-button type="is-success" size="is-small"></b-button>
-                            <b-button type="is-warning" size="is-small"></b-button>
-                            <b-button type="is-danger" size="is-small"></b-button>
-                        </div> -->
                         <b-field>
-                            <b-radio-button v-model="tag.label.level"
+                            <!-- <b-radio-button v-model="tag.label.level"
                                 native-value="1"
-                                type="is-info">
+                                type="is-info"
+                                focus>
+                                <b-icon icon="check-circle" ></b-icon> 
                             </b-radio-button>
                             <b-radio-button v-model="tag.label.level"
                                 native-value="2"
                                 type="is-success">
+                                <b-icon icon="check-circle" ></b-icon> 
                             </b-radio-button>
                             <b-radio-button v-model="tag.label.level"
                                 native-value="3"
                                 type="is-warning">
+                                <b-icon icon="check-circle" ></b-icon> 
                             </b-radio-button>
                             <b-radio-button v-model="tag.label.level"
                                 native-value="4"
                                 type="is-danger">
-                            </b-radio-button>
+                                <b-icon icon="check-circle"></b-icon> 
+                            </b-radio-button> -->
+                            <RecipeRadioButton v-model="tag.label.level"
+                                native-value="1"
+                                type="is-info">
+                                <b-icon icon="check-circle"></b-icon>
+                            </RecipeRadioButton>
+                            <RecipeRadioButton v-model="tag.label.level"
+                                native-value="2"
+                                type="is-success">
+                                <b-icon icon="check-circle"></b-icon>
+                            </RecipeRadioButton>
+                            <RecipeRadioButton v-model="tag.label.level"
+                                native-value="3"
+                                type="is-warning">
+                                <b-icon icon="check-circle"></b-icon>
+                            </RecipeRadioButton>
+                            <RecipeRadioButton v-model="tag.label.level"
+                                native-value="4"
+                                type="is-danger">
+                                <b-icon icon="check-circle"></b-icon>
+                            </RecipeRadioButton>
                         </b-field>
                     </b-dropdown-item>
                 </b-dropdown>
@@ -146,11 +165,13 @@ import Tag from 'Buefy/src/components/tag/Tag'
 import Autocomplete from 'Buefy/src/components/autocomplete/Autocomplete'
 import config from 'Buefy/src/utils/config'
 import FormElementMixin from 'Buefy/src/utils/FormElementMixin'
+import RecipeRadioButton from './components/RecipeRadioButton.vue'
 export default {
     name: 'recipe-tag-input',
     components: {
         [Autocomplete.name]: Autocomplete,
-        [Tag.name]: Tag
+        [Tag.name]: Tag,
+        [RecipeRadioButton.name]: RecipeRadioButton
     },
     mixins: [FormElementMixin],
     inheritAttrs: false,
