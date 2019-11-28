@@ -327,7 +327,7 @@ export default {
             this.$set(tag, "done", true);
         },
         addTag(tag) {
-            const tagToAdd = tag || this.newTag.trim()
+            const tagToAdd = tag || this.newTag
             if (tagToAdd) {
                 if (!this.autocomplete) {
                     const reg = this.separatorsAsRegExp
