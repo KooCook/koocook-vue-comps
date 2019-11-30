@@ -94,7 +94,9 @@
 <script>
 export default {
   name: "ingredient-chooser",
-  props: {"selectableUnits": { type: Object }, "initial": { type: Array, default: []}},
+  props: {"selectableUnits": { type: Object }, "initial": { type: Array, default: function () {
+        return []
+      }}},
   computed: {
     liveIngredients() {
       for (let ingredient of this.ingredients) {
