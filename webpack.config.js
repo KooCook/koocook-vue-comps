@@ -32,6 +32,11 @@ module.exports = (env) => {
 			filename : '[name].js',
 			path : path.resolve(__dirname, '../koocook_dj/static/js', filepath)
 		},
+		//    optimization: {
+		//     splitChunks: {
+		//        chunks: 'all',
+		//      },
+		//    },
 		resolve : {
 			extensions : ['.vue', '.js'],
 			alias : {
