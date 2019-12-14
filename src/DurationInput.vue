@@ -1,7 +1,7 @@
 <template>
   <span>
     <input :name="name" type="hidden" v-model="duration" />
-    <b-timepicker :enableSeconds="enableSeconds" v-model="time" inline></b-timepicker>
+    <b-timepicker :enable-seconds="enableSeconds" v-model="time" inline></b-timepicker>
   </span>
 </template>
 
@@ -14,11 +14,11 @@ export default {
     },
     initial: {
       type: String,
-      default: () => { return this.enableSeconds ? "00:00:00" : "00:00"}
+      default: () => "00:00:00"
     },
     enableSeconds: {
         type: Boolean,
-        default: false
+        default: () => false
     }
   },
   name: "duration-input",
