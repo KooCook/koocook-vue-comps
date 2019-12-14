@@ -1,6 +1,6 @@
 <template>
   <div>
-    <input type="hidden" name="image" id="id_image" v-model="JSON.stringify(images)" />
+    <input type="hidden" name="image" id="id_image" v-model="mediaAsStr" />
     <input type="hidden" name="video" id="id_video" />
     <form v-if="showAttach" class="holder-form" use-html5-validation @submit.prevent="addImage">
       <span class="details">
@@ -76,12 +76,28 @@ export default {
       indicatorInside: true,
       indicatorMode: "hover",
       indicatorStyle: "is-dots",
-      attachmentUrls: [{ src: "" }],
+      attachmentUrls: [],
       carousels: []
     };
   },
+  computed: {
+    mediaAsStr() {
+      return JSON.stringify(
+        this.carousels.map(element => {
+          return element.src;
+        })
+      );
+    }
+  },
+  mounted: function() {
+    if (this.initial) {
+      this.initial.forEach(element => this.attachmentUrls.push({ src: element }));
+      this.carousels = this.attachmentUrls;
+    }
+  },
   methods: {
     showAttachDialog() {
+      if (this.attachmentUrls.length == 0) { this.attachmentUrls =  [{ src: "" }]}
       this.showAttach = true;
       this.indicator = true;
     },
@@ -92,14 +108,14 @@ export default {
     addImage() {
       this.carousels = this.attachmentUrls;
       this.images = [];
-      this.carousels.forEach(element => this.images.push(element.src));
+      // this.carousels.forEach(element => this.images.push(element.src));
       this.showAttach = false;
     },
     addUrl() {
       this.attachmentUrls.push({ src: "" });
     }
   },
-  props: ["videos"]
+  props: ["videos", "initial"]
 };
 </script>
 

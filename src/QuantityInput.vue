@@ -1,29 +1,47 @@
 <template>
-  <span>
+  <b-field>
+      <input :name="name" type="hidden" v-model="asString" />
     <p class="control">
       <b-input
         size="is-small"
         type="number"
         step="any"
         autofocus
-        v-model="props.row.quantity.number"
+        v-model="number"
       />
     </p>
     <p class="control">
-      <b-select class="is-inline" v-model="props.row.quantity.unit" size="is-small">
-        <option v-for="(name, index) in units" :key="index" :value="name.unit">{{ name.unit }}</option>
+      <b-select class="is-inline" v-model="selectedUnit" size="is-small">
+        <option v-for="(name, index) in units" :key="index" :value="name.unit">{{ name | pluralize(number) }}</option>
       </b-select>
     </p>
-  </span>
+  </b-field>
 </template>
 
 <script>
 export default {
-    data: {
-        units: []
-    },
-    async created() {
+  props: ["section", "name", "initial"],
+  name: 'quantity-input',
+  computed: {
+      asString() {
+          return `${this.number} ${this.selectedUnit}`
+      }
+  },
+  data: () => { return {
+    conversionTable: [],
+    selectedUnit: 'serving',
+    units: [],
+    number: 0
+  }},
+  async created() {
+      if (this.initial) {
+          this.number = this.initial.amount;
+          this.selectedUnit = this.initial.unit;
+      }
+    const formBody = new FormData();
+    if (this.section) formBody.set("section", this.section);
     const resp = await fetch(`/recipes/unit_conv`, {
+      body: new URLSearchParams(formBody),
       method: "POST",
       credentials: "include",
       headers: {
@@ -31,17 +49,17 @@ export default {
         "X-CSRFToken": getCookie("csrftoken")
       }
     });
-    // if (resp.ok) {
-    //   if (typeof (await resp.clone().json()).current == "undefined")
-    //     this.selectables = [];
-    //   else {
-    //     this.conversionTable = (await resp.clone().json()).current;
-    //     for (const category in this.conversionTable) {
-    //       const item = this.conversionTable[category];
-    //       this.selectables.push(...item);
-    //     }
-    //   }
-    // }
+    if (resp.ok) {
+      if (typeof (await resp.clone().json()).current == "undefined")
+        this.units = [];
+      else {
+        this.conversionTable = (await resp.clone().json()).current;
+        for (const category in this.conversionTable) {
+          const item = this.conversionTable[category];
+          this.units.push(...item);
+        }
+      }
+    }
   }
 };
 </script>

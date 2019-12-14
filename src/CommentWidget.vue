@@ -4,7 +4,7 @@
     <article class="media" v-for="(comment, index) in comments" :key="index">
       <figure class="media-left">
         <p class="image is-64x64">
-          <!-- <img src="../assets/img/placeholders/128x128.png"> -->
+          <img :src="comment.author.user.avatar.content">
         </p>
       </figure>
       <div class="media-content">
@@ -120,6 +120,7 @@ export default {
   },
   methods: {
     async prefetchData() {
+      this.pending = true;
       this.comment_endpoints = this.isReply
         ? REPLIES_ENDPOINTS
         : COMMENTS_ENDPOINTS;
@@ -127,7 +128,9 @@ export default {
         this.isReply || this.customUrl
           ? this.comment_endpoints.GET.format(this.itemId)
           : this.comment_endpoints.GET;
-      return (await (await fetch(endpoint)).json()).current;
+      const json_data = (await fetch(endpoint)).json();
+      this.pending = false;
+      return (await json_data).current;
     },
     async postComment() {
       if (this.pending) return;

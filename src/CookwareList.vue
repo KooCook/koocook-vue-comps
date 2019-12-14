@@ -2,8 +2,8 @@
   <div>
     <input
       type="hidden"
-      name="recipe_instructions"
-      id="id_recipe_instructions"
+      name="cookware_list"
+      id="id_cookware_list"
       v-model="itemsAsStr"
     />
     <b-table
@@ -21,8 +21,8 @@
           <b-field>
             <b-input
               expanded
-              v-model="props.row.text"
-              placeholder="Enter your instruction step"
+              v-model="props.row.name"
+              placeholder="Enter your cookware name"
               type="textarea"
               required
             ></b-input>
@@ -35,7 +35,7 @@
         </td>
 
         <td v-if="!props.row.editing">
-          {{ props.row.text }}
+          {{ props.row.name }}
           <b-button size="is-small" type="is-light" @click="toggleEditing(props.index)">
             <b-icon icon="pencil"></b-icon>
           </b-button>
@@ -57,7 +57,7 @@
             <p>
               <b-icon icon="emoticon-sad" size="is-large"></b-icon>
             </p>
-            <p>No instruction step has been added. Consider adding one.</p>
+            <p>No cookware has been added.</p>
           </div>
         </section>
       </template>
@@ -66,10 +66,8 @@
 </template>
 
 <script>
-// import InstructionItem from "./InstructionItem.vue";
-
 export default {
-  name: "instruction-list",
+  name: "cookware-list",
   props: ["initial"],
   methods: {
     addInstruction() {
@@ -101,21 +99,21 @@ export default {
 
       const droppedOnRowIndex = payload.index;
       const droppedOn = this.items[droppedOnRowIndex];
-      const original = droppedOn.text;
+      const original = droppedOn.name;
       this.items[droppedOnRowIndex] = this.items[this.draggingRowIndex];
       this.items[this.draggingRowIndex] = droppedOn;
 
-      this.items[this.draggingRowIndex].text = droppedOn.text + "changed";
-      this.items[this.draggingRowIndex].text = original;
+      this.items[this.draggingRowIndex].name = droppedOn.name + "changed";
+      this.items[this.draggingRowIndex].name = original;
       this.$forceUpdate();
     }
   },
   computed: {
     itemsAsStr() {
-      return JSON.stringify(
-        this.items.map(element => {
-          return element.text;
-        })
+      return JSON.stringify( this.items
+        // this.items.map(element => {
+        //   return element.name;
+        // })
       );
     }
   },
@@ -134,17 +132,17 @@ export default {
   },
   data() {
     return {
-      items: this.initial ? this.initial : [{ text: "", editing: true }],
+      items: this.initial ? this.initial : [{ name: "", editing: true }],
       columns: [
         {
           field: "true",
-          label: "Step #",
+          label: "#",
           width: "40",
           centered: true
         },
         {
           field: "text",
-          label: "Instruction"
+          label: "Equipment name"
         }
       ]
     };
